@@ -1,0 +1,33 @@
+#index:
+#    path: /
+#    controller: App\Controller\DefaultController::index
+
+countries:
+  type    : rest
+  resource: App\Controller\CountryController
+  prefix  : api
+
+cities:
+  type    : rest
+  resource: App\Controller\CityController
+  prefix  : api
+
+informations:
+  type    : rest
+  resource: App\Controller\InformationController
+  prefix  : api
+
+users:
+  type    : rest
+  resource: App\Controller\UserController
+  prefix  : api
+
+clients:
+  type    : rest
+  resource: App\Controller\ClientController
+  prefix  : api
+
+projects:
+  type    : rest
+  resource: App\Controller\ProjectController
+  prefix  : api
