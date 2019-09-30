@@ -16,7 +16,6 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 
 class ProjectController extends AbstractFOSRestController
 {
-
     /**
      * @var ProjectRepository
      */
@@ -50,13 +49,21 @@ class ProjectController extends AbstractFOSRestController
     public function getProjectsAction()
     {
         $projects = $this->projectRepository->findAll();
-        return $this->view($projects, Response::HTTP_OK);
+        if ($projects) {
+            return $this->view($projects, Response::HTTP_OK);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
     public function getProjectAction(int $id)
     {
         $data = $this->projectRepository->find($id);
-        return $this->view($data, Response::HTTP_OK);
+        if ($data) {
+            return $this->view($data, Response::HTTP_OK);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
@@ -92,25 +99,75 @@ class ProjectController extends AbstractFOSRestController
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
             } else {
-                echo "client not found";
+                return $this->view($client, Response::HTTP_NOT_FOUND);
             }
         } else {
-            echo "user not found";
+            return $this->view($user, Response::HTTP_NOT_FOUND);
         }
-        return $this->view($project, Response::HTTP_OK);
+        return $this->view($project, Response::HTTP_CREATED);
+        return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
-    public function putProjectAction(int $id)
+    /**
+     * @Rest\View(statusCode=Response::HTTP_OK)
+     * @Rest\Put("/projects/{id}")
+     * @param Request $request
+     * @param int $id
+     * @return View
+     * @throws \Exception
+     */
+    public function putProjectAction(Request $request, int $id)
     {
-
+        $username = $request->get('manager');
+        $user = $this
+            ->userRepository
+            ->findOneBySomeField($username);
+        $clientId = $request->get('client');
+        $client = $this
+            ->clientRepository
+            ->findOneBySomeField($clientId);
+        $project = $this
+            ->projectRepository
+            ->find($id);
+        if ($user) {
+            if ($client) {
+                if ($project) {
+                    $project->setName($request->get('name'));
+                    $project->setStorage($request->get('storage'));
+                    $project->setStorageKey($request->get('storage_key'));
+                    $project->setDbname($request->get('dbname'));
+                    $project->setUrl($request->get('url'));
+                    $project->setDescription($request->get('description'));
+                    $project->setUpdatedAt(new \DateTime());
+                    $project->setManager($user);
+                    $project->setClient($client);
+                    $client->setProjects($project);
+                    $this->entityManager->persist($project);
+                    $this->entityManager->persist($client);
+                    $this->entityManager->persist($user);
+                    $this->entityManager->flush();
+                }
+                return $this->view($project, Response::HTTP_OK);
+            } else {
+                return $this->view($client, Response::HTTP_NOT_FOUND);
+            }
+        } else {
+            return $this->view($user, Response::HTTP_NOT_FOUND);
+        }
+        return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
     public function deleteProjectAction(int $id)
     {
         $project = $this->projectRepository->findOneBy(['id' => $id]);
-        $this->entityManager->remove($project);
-        $this->entityManager->flush();
-        return $this->view(null, Response::HTTP_NO_CONTENT);
+        if ($project) {
+            $this->entityManager->remove($project);
+            $this->entityManager->flush();
+            return $this->view(null, Response::HTTP_NO_CONTENT);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
 }

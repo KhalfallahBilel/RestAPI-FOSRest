@@ -50,13 +50,21 @@ class ClientController extends AbstractFOSRestController
     public function getClientsAction()
     {
         $clients = $this->clientRepository->findAll();
-        return $this->view($clients, Response::HTTP_OK);
+        if ($clients) {
+            return $this->view($clients, Response::HTTP_OK);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
     public function getClientAction(int $id)
     {
         $data = $this->clientRepository->find($id);
-        return $this->view($data, Response::HTTP_OK);
+        if ($data) {
+            return $this->view($data, Response::HTTP_OK);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
@@ -67,19 +75,60 @@ class ClientController extends AbstractFOSRestController
      */
     public function postClientsAction(Request $request)
     {
-        {
-            $username = $request->get('manager');
-            $user = $this
-                ->userRepository
-                ->findOneBySomeField($username);
-            $informationNumber = $request->get('information');
-            $information = $this
-                ->informationRepository
-                ->findOneBySomeField($informationNumber);
-            if ($user) {
+        $username = $request->get('manager');
+        $user = $this
+            ->userRepository
+            ->findOneBySomeField($username);
+        $informationNumber = $request->get('information');
+        $information = $this
+            ->informationRepository
+            ->findOneBySomeField($informationNumber);
+        if ($user) {
+            if ($information) {
+                $client = new Client();
+                $client->setNotes($request->get('notes'));
+                $client->setManager($user);
+                $client->setInformation($information);
+                $user->setClient($client);
+                $information->setClient($client);
+                $this->entityManager->persist($client);
+                $this->entityManager->persist($user);
+                $this->entityManager->persist($information);
+                $this->entityManager->flush();
+            } else {
+                return $this->view($information, Response::HTTP_NOT_FOUND);
+            }
+        } else {
+            return $this->view($user, Response::HTTP_NOT_FOUND);
+        }
+        return $this->view($client, Response::HTTP_CREATED);
+        return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
+    }
 
-                if ($information) {
-                    $client = new Client();
+    /**
+     * @Rest\View(statusCode=Response::HTTP_OK)
+     * @Rest\Put("/clients/{id}")
+     * @param Request $request
+     * @param int $id
+     * @return View
+     * @throws \Exception
+     */
+    public function putClientAction(Request $request, int $id)
+    {
+        $username = $request->get('manager');
+        $user = $this
+            ->userRepository
+            ->findOneBySomeField($username);
+        $informationNumber = $request->get('information');
+        $information = $this
+            ->informationRepository
+            ->findOneBySomeField($informationNumber);
+        $client = $this
+            ->clientRepository
+            ->find($id);
+        if ($user) {
+            if ($information) {
+                if ($client) {
                     $client->setNotes($request->get('notes'));
                     $client->setManager($user);
                     $client->setInformation($information);
@@ -89,27 +138,27 @@ class ClientController extends AbstractFOSRestController
                     $this->entityManager->persist($user);
                     $this->entityManager->persist($information);
                     $this->entityManager->flush();
-                } else {
-                    echo " information not found";
                 }
+                return $this->view($client, Response::HTTP_OK);
             } else {
-                echo " user not found";
+                return $this->view($information, Response::HTTP_NOT_FOUND);
             }
+        } else {
+            return $this->view($user, Response::HTTP_NOT_FOUND);
         }
-        return $this->view($client, Response::HTTP_OK);
-    }
-
-    public function putClientAction(int $id)
-    {
-
+        return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
     public function deleteClientAction(int $id)
     {
         $client = $this->clientRepository->findOneBy(['id' => $id]);
-        $this->entityManager->remove($client);
-        $this->entityManager->flush();
-        return $this->view(null, Response::HTTP_NO_CONTENT);
+        if ($client) {
+            $this->entityManager->remove($client);
+            $this->entityManager->flush();
+            return $this->view(null, Response::HTTP_NO_CONTENT);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
 
 }

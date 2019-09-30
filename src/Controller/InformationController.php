@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\City;
 use App\Entity\Information;
 use App\Repository\CityRepository;
 use App\Repository\InformationRepository;
@@ -43,14 +42,22 @@ class InformationController extends AbstractFOSRestController
 
     public function getInformationsAction()
     {
-        $informations =  $this->informationRepository->findAll();
-        return $this->view($informations, Response::HTTP_OK);
+        $informations = $this->informationRepository->findAll();
+        if ($informations) {
+            return $this->view($informations, Response::HTTP_OK);
+        } else {
+            return $this->view($informations, Response::HTTP_NOT_FOUND);
+        }
     }
 
     public function getInformationAction(int $id)
     {
         $data = $this->informationRepository->find($id);
-        return $this->view($data, Response::HTTP_OK);
+        if ($data) {
+            return $this->view($data, Response::HTTP_OK);
+        } else {
+            return $this->view($data, Response::HTTP_NOT_FOUND);
+        }
     }
 
     /**
@@ -78,22 +85,59 @@ class InformationController extends AbstractFOSRestController
             $this->entityManager->persist($information);
             $this->entityManager->flush();
         } else {
-            echo "not found";
+            return $this->view($city, Response::HTTP_NOT_FOUND);
         }
-        return $this->view($information, Response::HTTP_OK);
+        return $this->view($information, Response::HTTP_CREATED);
+        return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
-    public function putInformationAction(int $id)
+    /**
+     * @Rest\View(statusCode=Response::HTTP_OK)
+     * @Rest\Put("/informations/{id}")
+     * @param Request $request
+     * @param int $id
+     * @return View
+     * @throws \Exception
+     */
+    public function putInformationAction(Request $request, int $id)
     {
-
+        $cityName = $request->get('city');
+        $city = $this->cityRepository->findOneBySomeField($cityName);
+        if ($cityName) {
+            echo $city;
+            echo "the city is : " . $city;
+            $information = $this->informationRepository->find($id);
+            echo $information;
+            if ($information) {
+                echo $information;
+                $information->setNumber($request->get('number'));
+                $information->setStreet($request->get('street'));
+                $information->setAddressComplement($request->get('address_complement'));
+                $information->setPhone($request->get('phone'));
+                $information->setMobile($request->get('mob'));
+                $information->setNotes($request->get('notes'));
+                $information->setUpdateAt(new \DateTime());
+                $information->setCity($city);
+                $this->entityManager->persist($city);
+                $this->entityManager->persist($information);
+                $this->entityManager->flush();
+            }
+            return $this->view($information, Response::HTTP_OK);
+        } else {
+            return $this->view($city, Response::HTTP_NOT_FOUND);
+        }
+        return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
     public function deleteInformationAction(int $id)
     {
         $information = $this->informationRepository->findOneBy(['id' => $id]);
-        $this->entityManager->remove($information);
-        $this->entityManager->flush();
-        return $this->view(null, Response::HTTP_NO_CONTENT);
+        if ($information) {
+            $this->entityManager->remove($information);
+            $this->entityManager->flush();
+            return $this->view(null, Response::HTTP_NO_CONTENT);
+        } else {
+            return $this->view(null, Response::HTTP_NOT_FOUND);
+        }
     }
-
 }
