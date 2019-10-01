@@ -5,8 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
-use App\Entity\City;
-
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CountryRepository")
  */
@@ -20,11 +20,13 @@ class Country
     private $id;
 
     /**
+     * @SWG\Property(ref=@Model(type=User::class))
      * @ORM\Column(type="string", length=255)
      */
     private $name;
 
     /**
+     * @SWG\Property(type="string", maxLength=255)
      * @ORM\Column(type="string", length=255)
      */
     private $iso_code;

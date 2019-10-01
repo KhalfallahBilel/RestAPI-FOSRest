@@ -10,11 +10,13 @@ security:
     providers:
         fos_userbundle:
             id: fos_user.user_provider.username_email
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         #Pour JWT Auth Security
+
         login:
             pattern: ^/api/login
             stateless: true
@@ -23,18 +25,6 @@ security:
                 check_path: /api/login_check
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
-#            refresh:
-#                pattern: ^/api/token/refresh
-#                stateless: true
-#                anonymous: true
-#
-#            register:
-#                pattern: ^/api/register
-#                stateless: true
-#                anonymous: true
-
-
 
         api:
             pattern: ^/api
@@ -48,7 +38,7 @@ security:
 #            user_checker: fos_user.user_checker
             form_login:
                 provider: fos_userbundle
-                login_path: fos_user_security_login
+                login_path: api/login_check
                 check_path: fos_user_security_check
                 csrf_token_generator: security.csrf.token_manager
                 always_use_default_target_path: true
@@ -64,6 +54,10 @@ security:
               path: fos_user_security_logout
             anonymous:    true
 
+        api_doc:
+            pattern: ^/api/doc
+            security: false
+
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
 
@@ -73,12 +67,14 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        - { path: ^/api/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/swg/doc, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api, role: IS_AUTHENTICATED_FULLY }
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/register, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/resetting, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin/, role: ROLE_ADMIN }
         - { path: ^/dashboard, role: ROLE_USER }
         - { path: ^/admin/, role: ROLE_USER }
-        - { path: ^/api/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api, role: IS_AUTHENTICATED_FULLY }
+
 

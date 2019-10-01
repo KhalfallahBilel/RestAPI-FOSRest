@@ -8,6 +8,9 @@ use App\Repository\CountryRepository;
 use Exception;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest; // alias pour toutes les annotations
 use Doctrine\ORM\EntityManagerInterface;
@@ -39,6 +42,22 @@ class CountryController extends AbstractFOSRestController
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns an array of countries",
+     *      @SWG\Schema(
+     *         type="array",
+     *         @SWG\Items(ref=@Model(type=Country::class, groups={"full"}))
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="countries")
+     * @Security(name="Bearer")
+     */
     public function getCountriesAction()
     {
         $countries = $this->countryRepository->findAll();
