@@ -142,6 +142,12 @@
       <path value="$PROJECT_DIR$/vendor/friendsofsymfony/rest-bundle" />
       <path value="$PROJECT_DIR$/vendor/willdurand/negotiation" />
       <path value="$PROJECT_DIR$/vendor/willdurand/jsonp-callback-validator" />
+      <path value="$PROJECT_DIR$/vendor/exsyst/swagger" />
+      <path value="$PROJECT_DIR$/vendor/nelmio/api-doc-bundle" />
+      <path value="$PROJECT_DIR$/vendor/zircote/swagger-php" />
+      <path value="$PROJECT_DIR$/vendor/lexik/jwt-authentication-bundle" />
+      <path value="$PROJECT_DIR$/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/vendor/namshi/jose" />
     </include_path>
   </component>
   <component name="ProjectId" id="1Qxb07x5yx8Vg7NMrUs0YjdBtSB" />
@@ -196,7 +202,7 @@
       <workItem from="1568972444680" duration="26467000" />
       <workItem from="1569592417106" duration="5427000" />
       <workItem from="1569616757590" duration="12241000" />
-      <workItem from="1569830444934" duration="12718000" />
+      <workItem from="1569830444934" duration="23167000" />
     </task>
     <servers />
   </component>
