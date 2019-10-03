@@ -8,6 +8,9 @@ use App\Repository\ClientRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use App\Entity\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -47,6 +50,22 @@ class ClientController extends AbstractFOSRestController
         $this->informationRepository = $informationRepository;
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns an array of cleints",
+     *      @SWG\Schema(
+     *         type="array",
+     *         @Model(type=Client::class, groups={"non_sensitive_data"})
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="clients")
+     * @Security(name="Bearer")
+     */
     public function getClientsAction()
     {
         $clients = $this->clientRepository->findAll();
@@ -57,6 +76,20 @@ class ClientController extends AbstractFOSRestController
         }
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a client by id",
+     *     @Model(type=Client::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="clients")
+     * @Security(name="Bearer")
+     *
+     */
     public function getClientAction(int $id)
     {
         $data = $this->clientRepository->find($id);
@@ -68,10 +101,25 @@ class ClientController extends AbstractFOSRestController
     }
 
     /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Client Created with success",
+     *     @Model(type=Client::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad Request",
+     * )
      * @Rest\View(statusCode=Response::HTTP_CREATED)
      * @Rest\Post("/clients")
      * @param Request $request
      * @return View
+     * @SWG\Tag(name="clients")
+     * @Security(name="Bearer")
      */
     public function postClientsAction(Request $request)
     {
@@ -106,12 +154,27 @@ class ClientController extends AbstractFOSRestController
     }
 
     /**
+     * @SWG\Response(
+     *     response=201,
+     *     description="Client updated with success",
+     *     @Model(type=Client::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad Request",
+     * )
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Put("/clients/{id}")
      * @param Request $request
      * @param int $id
      * @return View
      * @throws \Exception
+     * @SWG\Tag(name="clients")
+     * @Security(name="Bearer")
      */
     public function putClientAction(Request $request, int $id)
     {
@@ -149,6 +212,22 @@ class ClientController extends AbstractFOSRestController
         return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
+    /**
+     * @SWG\Response(
+     *     response=201,
+     *     description="No Content",
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=404,
+     *     description="Client Not Found",
+     * )
+     * @SWG\Tag(name="clients")
+     * @Security(name="Bearer")
+     */
     public function deleteClientAction(int $id)
     {
         $client = $this->clientRepository->findOneBy(['id' => $id]);

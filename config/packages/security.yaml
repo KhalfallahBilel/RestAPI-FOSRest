@@ -39,6 +39,7 @@ security:
             form_login:
                 provider: fos_userbundle
                 login_path: api/login_check
+                default_target_path: sonata_admin_dashboard
                 check_path: fos_user_security_check
                 csrf_token_generator: security.csrf.token_manager
                 always_use_default_target_path: true

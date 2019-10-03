@@ -8,6 +8,10 @@ use App\Repository\InformationRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use phpDocumentor\Reflection\DocBlock\Serializer;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -40,6 +44,22 @@ class UserController extends AbstractFOSRestController
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns an array of users",
+     *      @SWG\Schema(
+     *         type="array",
+     *         @Model(type=User::class, groups={"non_sensitive_data"})
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function getUsersAction()
     {
         $users = $this->userRepository->findAll();
@@ -50,6 +70,21 @@ class UserController extends AbstractFOSRestController
         }
     }
 
+
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a user by id",
+     *     @Model(type=User::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="users")
+     * @Security(name="Bearer")
+     *
+     */
     public function getUserAction(int $id)
     {
         $data = $this->userRepository->find($id);
@@ -61,10 +96,25 @@ class UserController extends AbstractFOSRestController
     }
 
     /**
+     *  @SWG\Response(
+     *     response=200,
+     *     description="User Created with success",
+     *     @Model(type=User::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad Request",
+     * )
      * @Rest\View(statusCode=Response::HTTP_CREATED)
      * @Rest\Post("/users")
      * @param Request $request
      * @return View
+     * @SWG\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function postUsersAction(Request $request)
     {
@@ -92,12 +142,27 @@ class UserController extends AbstractFOSRestController
     }
 
     /**
+     *  @SWG\Response(
+     *     response=201,
+     *     description="User updated with success",
+     *     @Model(type=User::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad Request",
+     * )
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Put("/users/{id}")
      * @param Request $request
      * @param int $id
      * @return View
      * @throws \Exception
+     * @SWG\Tag(name="users")
+     * @Security(name="Bearer")
      */
     public function putUserAction(Request $request, int $id)
     {
@@ -129,6 +194,22 @@ class UserController extends AbstractFOSRestController
         return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
+    /**
+     * @SWG\Response(
+     *     response=201,
+     *     description="No Content",
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=404,
+     *     description="User Not Found",
+     * )
+     * @SWG\Tag(name="users")
+     * @Security(name="Bearer")
+     */
     public function deleteUserAction(int $id)
     {
         $user = $this->userRepository->findOneBy(['id' => $id]);

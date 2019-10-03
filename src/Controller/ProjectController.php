@@ -9,6 +9,9 @@ use App\Repository\ProjectRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
+use Nelmio\ApiDocBundle\Annotation\Model;
+use Swagger\Annotations as SWG;
+use Nelmio\ApiDocBundle\Annotation\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -46,6 +49,22 @@ class ProjectController extends AbstractFOSRestController
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns an array of projects",
+     *      @SWG\Schema(
+     *         type="array",
+     *         @Model(type=Project::class, groups={"non_sensitive_data"})
+     *     )
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="projects")
+     * @Security(name="Bearer")
+     */
     public function getProjectsAction()
     {
         $projects = $this->projectRepository->findAll();
@@ -56,6 +75,20 @@ class ProjectController extends AbstractFOSRestController
         }
     }
 
+    /**
+     * @SWG\Response(
+     *     response=200,
+     *     description="Returns a project by id",
+     *     @Model(type=Project::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Tag(name="projects")
+     * @Security(name="Bearer")
+     *
+     */
     public function getProjectAction(int $id)
     {
         $data = $this->projectRepository->find($id);
@@ -67,10 +100,25 @@ class ProjectController extends AbstractFOSRestController
     }
 
     /**
+     *  @SWG\Response(
+     *     response=200,
+     *     description="Project Created with success",
+     *     @Model(type=Project::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad Request",
+     * )
      * @Rest\View(statusCode=Response::HTTP_CREATED)
      * @Rest\Post("/projects")
      * @param Request $request
      * @return View
+     * @SWG\Tag(name="projects")
+     * @Security(name="Bearer")
      */
     public function postProjectsAction(Request $request)
     {
@@ -109,12 +157,27 @@ class ProjectController extends AbstractFOSRestController
     }
 
     /**
+     * @SWG\Response(
+     *     response=201,
+     *     description="Project updated with success",
+     *     @Model(type=Project::class, groups={"non_sensitive_data"})
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=400,
+     *     description="Bad Request",
+     * )
      * @Rest\View(statusCode=Response::HTTP_OK)
      * @Rest\Put("/projects/{id}")
      * @param Request $request
      * @param int $id
      * @return View
      * @throws \Exception
+     * @SWG\Tag(name="projects")
+     * @Security(name="Bearer")
      */
     public function putProjectAction(Request $request, int $id)
     {
@@ -157,6 +220,22 @@ class ProjectController extends AbstractFOSRestController
         return $this->view(['name' => 'This cannot be null'], Response::HTTP_BAD_REQUEST);
     }
 
+    /**
+     * @SWG\Response(
+     *     response=201,
+     *     description="No Content",
+     * )
+     * @SWG\Response(
+     *     response=401,
+     *     description="JWT Not valid ! No permission",
+     * )
+     * @SWG\Response(
+     *     response=404,
+     *     description="Project Not Found",
+     * )
+     * @SWG\Tag(name="projects")
+     * @Security(name="Bearer")
+     */
     public function deleteProjectAction(int $id)
     {
         $project = $this->projectRepository->findOneBy(['id' => $id]);

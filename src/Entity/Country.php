@@ -5,14 +5,15 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
-use Nelmio\ApiDocBundle\Annotation\Model;
 use Swagger\Annotations as SWG;
+
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CountryRepository")
  */
 class Country
 {
     /**
+     * @SWG\Property(description="The unique identifier of the country.")
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
@@ -20,7 +21,7 @@ class Country
     private $id;
 
     /**
-     * @SWG\Property(ref=@Model(type=User::class))
+     * @SWG\Property(type="string", maxLength=255)
      * @ORM\Column(type="string", length=255)
      */
     private $name;
@@ -32,6 +33,7 @@ class Country
     private $iso_code;
 
     /**
+     *
      * @ORM\Column(type="datetime")
      */
     private $created_at;
